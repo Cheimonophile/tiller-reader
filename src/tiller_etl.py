@@ -7,6 +7,8 @@ from .constants import *
 
 def tiller_to_db():
     transactions = pd.read_excel(TILLER_PATH, sheet_name='Transactions', parse_dates=['Date', 'Month','Week','Date Added'])
+    categories = pd.read_excel('../Tiller.xlsx', sheet_name='Categories')
+    transactions = transactions.merge(categories[['Category','Group','Type']], how='left')
     transactions.columns = transactions.columns.str.lower().str.replace(' ', '_').str.replace('#','no')
     transactions = transactions.set_index('transaction_id').reset_index()
     transactions['amount'] = transactions['amount'].mul(100).astype(int)
@@ -21,7 +23,7 @@ def tiller_to_db():
         conn.executemany(sql, rows)
 
 
-def get_tiller() -> pd.DataFrame:
+def get_transactions() -> pd.DataFrame:
     tiller_to_db()
     with sqlite3.connect(DB_PATH) as conn:
         df = pd.read_sql("SELECT * FROM transactions;", conn, parse_dates=['date', 'month','week','date_added'])
