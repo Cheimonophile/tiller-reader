@@ -39,11 +39,13 @@ app.layout = html.Div(
                 for report in reports.values()
             ],
         ),
-        dbc.Container(
-            children=[
-                title := html.H4(""),
-                body := html.Div(),
-            ]
+        dcc.Loading(
+            dbc.Container(
+                children=[
+                    title := html.H4(""),
+                    body := html.Div(),
+                ]
+            ),
         ),
     ],
 )
@@ -58,7 +60,7 @@ def load_content(url: str):
     try:
         # parse the report id
         try:
-            (_,report_id) = url.split("/")
+            (_, report_id) = url.split("/")
         except Exception as e:
             raise Exception(f"Invalid url: {url}")
 
